@@ -1,4 +1,6 @@
+# desc
+convert your favourite spotify playlists and albums to mp3 files!
+mp3 files come packaged with correct metadata, including album covers.
+
 # Installation and usage instructions
-1. Download [https://www.python.org/downloads/](Python).
-2. Run ```pip install spotipy pytube pydub google-api-python-client mutagen``` to install packages
-3. Run `python albump3.py`
+errr not done yet
