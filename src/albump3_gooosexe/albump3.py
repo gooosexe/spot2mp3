@@ -1,4 +1,5 @@
 import spotipy
+import json
 from pytube import YouTube
 from spotipy.oauth2 import SpotifyClientCredentials
 from pytube import YouTube
@@ -82,7 +83,8 @@ def update_mp3_metadata(file_path, metadata, cover_url):
 	os.remove('cover.jpg')
 
 # spotify auth
-client_credentials_manager = SpotifyClientCredentials(client_id="f8840b045b7346099b8ac174b2242757", client_secret="1a2df4c64eb549c0bdec1cd63670f495")
+spotify_creds = json.load(open('spotify_creds.json'))
+client_credentials_manager = SpotifyClientCredentials(client_id=spotify_creds["client_id"], client_secret=spotify_creds["client_secret"])
 sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
 # extracting tracks from a playlist
