@@ -50,8 +50,8 @@ def yt_download(links, title):
 
 	printLog(f'Downloaded mp4 file from {links[index]}, converting to mp3...')
 
-	if not os.path.exists("downloads"):
-		os.makedirs("downloads")
+	if not os.path.exists("spot2mp3_downloads"):
+		os.makedirs("spot2mp3_downloads")
 
 	audio = AudioSegment.from_file(downloaded)
 	audio.export(f'downloads/{title}.mp3', format="mp3")
