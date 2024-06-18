@@ -3,8 +3,8 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "spot2mp3_gooosexe"
-version = "1.0.0"
+name = "spot2mp3"
+version = "1.0.1"
 authors = [
   { name="Oliver Huang", email="ohuang4131@gmail.com" },
 ]
