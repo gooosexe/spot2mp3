@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="spot2mp3",
-    version="1.0.0",
+    version="1.0.3",
     description="A CLI tool to download Spotify playlist/album tracks as mp3 files.",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
