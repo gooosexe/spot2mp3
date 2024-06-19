@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="spot2mp3",
-    version="0.1.1",
+    version="1.0.0",
     description="A CLI tool to download Spotify playlist/album tracks as mp3 files.",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
@@ -11,6 +11,7 @@ setup(
     url="https://github.com/gooosexe/spot2mp3",
     license="GPLv3",
     packages=find_packages(),
+	package_data={"spot2mp3": ["data/*.json"]},
     classifiers=[
         "Programming Language :: Python :: 3",
 		"License :: OSI Approved :: GNU General Public License v3 (GPLv3)",

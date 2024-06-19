@@ -1,6 +1,7 @@
 import spotipy
 import json
 import argparse
+import pkg_resources
 from pytube import YouTube
 from spotipy.oauth2 import SpotifyClientCredentials
 from pytube import YouTube
@@ -12,8 +13,21 @@ import requests
 import os
 import re
 
+# colours for terminal output
+class color:
+   PURPLE = '\033[95m'
+   CYAN = '\033[96m'
+   DARKCYAN = '\033[36m'
+   BLUE = '\033[94m'
+   GREEN = '\033[92m'
+   YELLOW = '\033[93m'
+   RED = '\033[91m'
+   BOLD = '\033[1m'
+   UNDERLINE = '\033[4m'
+   END = '\033[0m'
+
 # spotify auth
-spotify_creds = json.load(open('spotify_creds.json'))
+spotify_creds = json.load(open(pkg_resources.resource_filename('spot2mp3.data', 'spotify_creds.json')))
 client_credentials_manager = SpotifyClientCredentials(client_id=spotify_creds["client_id"], client_secret=spotify_creds["client_secret"])
 sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
@@ -24,10 +38,12 @@ def printLog(*args, **kwargs):
 		print(*args, **kwargs, file=f)
 
 def youtube_search(query, max_results=3):
-	yt = YTMusic('oauth.json')
-	search_results = yt.search(query, limit=max_results)
-	#search_response = VideosSearch(query, limit=max_results)
-	#results = "https://www.youtube.com/watch?v=" + search_response.result()["result"][0]["id"]
+	yt = YTMusic(pkg_resources.resource_filename('spot2mp3.data', 'oauth.json'))
+	try:
+		search_results = yt.search(query, limit=max_results)
+	except Exception as e:
+		printLog(f'Error: {e}')
+		return []
 	video_ids = []
 	for result in search_results:
 		try:
@@ -59,7 +75,7 @@ def yt_download(links, title, output_dir):
 	if not os.path.exists(output_dir):
 		os.makedirs(output_dir)
 	audio = AudioSegment.from_file(downloaded)
-	audio.export(f'{output_dir}/{title}.mp3', format="mp3")
+	audio.export(f'{os.getcwd()}/{output_dir}/{title}.mp3', format="mp3")
 	os.remove(downloaded)
 
 	printLog("Converted to mp3 - saved as \"{}.mp3\"".format(title))
@@ -111,7 +127,7 @@ def main():
 		print(f'Error: {e} - please enter a valid Spotify playlist/album link.')
 		exit()
 
-
+	songcount = 0;
 	for track in tracklist:
 		# track_link = track["track"]["external_urls"]["spotify"]
 		# track_uri = track["track"]["uri"]
@@ -146,12 +162,18 @@ def main():
 		}
 
 		sanitized_title = re.sub(r'[<>:"/\\|?*\x00-\x1F]', '_', track_name)
-
+		
+		print(f'{color.UNDERLINE}{color.BOLD}Song {songcount}:{color.END}')
 		print(f'Searching with query \"{sanitized_title} by {artist_name}\"...')
 		yt_download(youtube_search(f'{sanitized_title} by {artist_name}'), sanitized_title, args.output)
 		print("Editing metadata...")
-		update_mp3_metadata(f'downloads/{sanitized_title}.mp3', metadata, album_cover)
-		print("Done!")
+		try:
+			update_mp3_metadata(f'{args.output}/{sanitized_title}.mp3', metadata, album_cover)
+		except Exception as e:
+			print(f'{color.RED}Error editing metadata: {e}{color.END}')
+			continue
+		print(f"{color.GREEN}Done!{color.END}\n")
+		songcount += 1
 
 if __name__ == "__main__":
 	main()

@@ -1,1 +1,2 @@
 include LICENSE
+include spot2mp3/data/*.json

@@ -10,3 +10,6 @@ spot2mp3.egg-info/SOURCES.txt
 spot2mp3.egg-info/dependency_links.txt
 spot2mp3.egg-info/entry_points.txt
 spot2mp3.egg-info/top_level.txt
+spot2mp3/data/__init__.py
+spot2mp3/data/oauth.json
+spot2mp3/data/spotify_creds.json
