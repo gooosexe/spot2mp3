@@ -3,8 +3,9 @@ import json
 import argparse
 import pkg_resources
 from pytube import YouTube
+import pafy
+import yt_dlp
 from spotipy.oauth2 import SpotifyClientCredentials
-from pytube import YouTube
 from pydub import AudioSegment
 from ytmusicapi import YTMusic
 from mutagen.mp3 import MP3
@@ -13,7 +14,7 @@ import requests
 import os
 import re
 
-# colours for terminal output
+# colours for hello output
 class color:
    PURPLE = '\033[95m'
    CYAN = '\033[96m'
@@ -47,19 +48,34 @@ def youtube_search(query, max_results=3):
 	video_ids = []
 	for result in search_results:
 		try:
-			video_ids.append("www.music.youtube.com/watch?v=" + result["videoId"])
+			video_ids.append("https://music.youtube.com/watch?v=" + result["videoId"])
 		except:
 			continue
+
+	print(f'video_ids: {video_ids}')
 	return video_ids
 
 def yt_download(links, title, output_dir):
+	if not os.path.exists(output_dir):
+		os.makedirs(output_dir)
+
 	index = 0
 	success = False
 	while (success == False and index < len(links)):
 		try:
-			yt_vid = YouTube(links[index])
-			stream = yt_vid.streams.filter(only_audio=True).first()
-			downloaded = stream.download()
+			print(f'trying link {links[index]}')
+			ydl_opts = {
+				'format': 'bestaudio/best',
+				'postprocessors': [{
+					'key': 'FFmpegExtractAudio',
+					'preferredcodec': 'mp3',
+				}],
+				'outtmpl': f'{os.getcwd()}/{output_dir}/{title}.%(ext)s',
+				#'quiet': True
+			}
+			with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+				ydl.download([links[index]])
+
 			success = True
 		except Exception as e:
 			printLog(f'Error: {e}')
@@ -72,11 +88,9 @@ def yt_download(links, title, output_dir):
 
 	printLog(f'Downloaded mp4 file from {links[index]}, converting to mp3...')
 	
-	if not os.path.exists(output_dir):
-		os.makedirs(output_dir)
-	audio = AudioSegment.from_file(downloaded)
-	audio.export(f'{os.getcwd()}/{output_dir}/{title}.mp3', format="mp3")
-	os.remove(downloaded)
+	#audio = AudioSegment.from_file(downloaded)
+	#audio.export(f'{os.getcwd()}/{output_dir}/{title}.mp3', format="mp3")
+	#os.remove(downloaded)
 
 	printLog("Converted to mp3 - saved as \"{}.mp3\"".format(title))
 
