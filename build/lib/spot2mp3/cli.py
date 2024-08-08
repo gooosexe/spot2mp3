@@ -132,7 +132,7 @@ def main():
 		print(f'Error: {e} - please enter a valid Spotify playlist/album link.')
 		exit()
 
-	songcount = 0;
+	songcount = 1;
 	for track in tracklist:
 		# track_link = track["track"]["external_urls"]["spotify"]
 		# track_uri = track["track"]["uri"]
@@ -142,7 +142,10 @@ def main():
 
 		# get genre
 		artist_info = sp.artist(artist_uri)
-		genre = artist_info["genres"][0]
+		if len(artist_info["genres"]) == 0:
+			genre = ""
+		else:
+			genre = artist_info["genres"][0]
 
 		album_info = sp.album(album_uri)
 
