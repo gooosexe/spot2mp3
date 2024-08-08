@@ -9,7 +9,7 @@ from spotipy.oauth2 import SpotifyClientCredentials
 from pydub import AudioSegment
 from ytmusicapi import YTMusic
 from mutagen.mp3 import MP3
-from mutagen.id3 import ID3, APIC, TIT2, TPE1, TALB, TDRC, TRCK
+from mutagen.id3 import ID3, APIC, TIT2, TPE1, TALB, TDRC, TRCK, TCON
 import requests
 import os
 import re
@@ -97,6 +97,7 @@ def update_mp3_metadata(file_path, metadata, cover_url):
 	audio.tags["TPE1"] = TPE1(encoding=3, text=metadata["artist"])
 	audio.tags["TALB"] = TALB(encoding=3, text=metadata["album"])
 	audio.tags["TDRC"] = TDRC(encoding=3, text=metadata["date"])
+	audio.tags["TCON"] = TCON(encoding=3, text=metadata["genre"])
 	audio.tags["TRCK"] = TRCK(encoding=3, text=str(metadata["track_number"]))
 	audio.tags["APIC"] = APIC(
 		encoding=3,
@@ -137,7 +138,11 @@ def main():
 		# track_uri = track["track"]["uri"]
 		if list_type == "playlist":
 			album_uri = track["track"]["album"]["uri"]
-		# artist_uri = track["track"]["artists"][0]["uri"]
+		artist_uri = track["track"]["artists"][0]["uri"]
+
+		# get genre
+		artist_info = sp.artist(artist_uri)
+		genre = artist_info["genres"][0]
 
 		album_info = sp.album(album_uri)
 
@@ -161,6 +166,7 @@ def main():
 			"title": track_name,
 			"artist": artist_name,
 			"album": album,
+			"genre": genre.capitalize(),
 			"date": album_release_date,
 			"track_number": track_number,
 		}

@@ -9,7 +9,7 @@ from spotipy.oauth2 import SpotifyClientCredentials
 from pydub import AudioSegment
 from ytmusicapi import YTMusic
 from mutagen.mp3 import MP3
-from mutagen.id3 import ID3, APIC, TIT2, TPE1, TALB, TDRC, TRCK
+from mutagen.id3 import ID3, APIC, TIT2, TPE1, TALB, TDRC, TRCK, TCON
 import requests
 import os
 import re
@@ -52,7 +52,6 @@ def youtube_search(query, max_results=3):
 		except:
 			continue
 
-	print(f'video_ids: {video_ids}')
 	return video_ids
 
 def yt_download(links, title, output_dir):
@@ -63,7 +62,6 @@ def yt_download(links, title, output_dir):
 	success = False
 	while (success == False and index < len(links)):
 		try:
-			print(f'trying link {links[index]}')
 			ydl_opts = {
 				'format': 'bestaudio/best',
 				'postprocessors': [{
@@ -86,14 +84,6 @@ def yt_download(links, title, output_dir):
 		printLog("Error: Could not download video.")
 		return
 
-	printLog(f'Downloaded mp4 file from {links[index]}, converting to mp3...')
-	
-	#audio = AudioSegment.from_file(downloaded)
-	#audio.export(f'{os.getcwd()}/{output_dir}/{title}.mp3', format="mp3")
-	#os.remove(downloaded)
-
-	printLog("Converted to mp3 - saved as \"{}.mp3\"".format(title))
-
 def update_mp3_metadata(file_path, metadata, cover_url):
 	cover = requests.get(cover_url, stream=True)
 	with open('cover.jpg', 'wb') as f:
@@ -107,6 +97,7 @@ def update_mp3_metadata(file_path, metadata, cover_url):
 	audio.tags["TPE1"] = TPE1(encoding=3, text=metadata["artist"])
 	audio.tags["TALB"] = TALB(encoding=3, text=metadata["album"])
 	audio.tags["TDRC"] = TDRC(encoding=3, text=metadata["date"])
+	audio.tags["TCON"] = TCON(encoding=3, text=metadata["genre"])
 	audio.tags["TRCK"] = TRCK(encoding=3, text=str(metadata["track_number"]))
 	audio.tags["APIC"] = APIC(
 		encoding=3,
@@ -147,7 +138,11 @@ def main():
 		# track_uri = track["track"]["uri"]
 		if list_type == "playlist":
 			album_uri = track["track"]["album"]["uri"]
-		# artist_uri = track["track"]["artists"][0]["uri"]
+		artist_uri = track["track"]["artists"][0]["uri"]
+
+		# get genre
+		artist_info = sp.artist(artist_uri)
+		genre = artist_info["genres"][0]
 
 		album_info = sp.album(album_uri)
 
@@ -171,6 +166,7 @@ def main():
 			"title": track_name,
 			"artist": artist_name,
 			"album": album,
+			"genre": genre.capitalize(),
 			"date": album_release_date,
 			"track_number": track_number,
 		}
@@ -188,6 +184,7 @@ def main():
 			continue
 		print(f"{color.GREEN}Done!{color.END}\n")
 		songcount += 1
+	print(f'{color.BLUE}{color.BOLD}Downloaded {songcount} songs to {args.output}.')
 
 if __name__ == "__main__":
 	main()
