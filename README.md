@@ -1,4 +1,8 @@
 # spot2mp3
+![Static Badge](https://img.shields.io/badge/build-failing-red)
+
+# ⚠️ One of the packages has broken, and I have not had the time to fix it yet. A fix is coming soon, though!
+
 Convert your favourite spotify playlists and albums to MP3 files!
 
 MP3 files come packaged with correct metadata, including album covers.
